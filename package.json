@@ -6,8 +6,8 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build"
+    "dev": "turbo run dev --no-daemon",
+    "build": "turbo run build --no-daemon"
   },
   "workspaces": [
     "apps/*"
