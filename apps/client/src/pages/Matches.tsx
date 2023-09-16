@@ -1,49 +1,39 @@
-import { useState, useEffect } from "react";
+import { observer } from "mobx-react";
+import { useEffect } from "react";
+
+import { matchesStore } from "@store/MatchesStore";
+import { SingleMatch } from "@features/Matches/components/SingleMatch";
+import { MatchesButton } from "@features/Matches/components/MatchesButton/MatchesButton";
 import { socket } from "@common/socket";
-import { Match } from "@features/Matches/types";
-import { SingleMatch } from "@features/Matches/SingleMatch";
+import {
+  MatchResponseMessages,
+  Match,
+  MatchStatus,
+} from "@features/Matches/types";
 
-export const Matches = () => {
-  const [matchTime, setMatchTime] = useState(0);
-  const [matches, setMatches] = useState<Match[]>([]);
-
-  const handleStart = () => {
-    socket.emit("start");
-  };
-
-  const handleReset = () => {
-    socket.emit("restart");
-  };
-
-  const handleStop = () => {
-    socket.emit("stop");
-  };
-
+export const Matches = observer(() => {
   useEffect(() => {
-    socket.on("matches", (data) => {
-      setMatches(data);
+    socket.on(MatchResponseMessages.Matches, (data: Match[]) => {
+      matchesStore.setMatches(data);
     });
 
-    socket.on("time", (time) => {
-      console.log(time);
-      setMatchTime(time);
+    socket.on(MatchResponseMessages.EndTime, () => {
+      matchesStore.setMatchStatus(MatchStatus.Finished);
     });
 
     return () => {
-      socket.off("matches");
-      socket.off("time");
+      socket.off(MatchResponseMessages.Matches);
+      socket.off(MatchResponseMessages.EndTime);
     };
   });
 
   return (
     <div>
-      <h5>{matchTime}</h5>
-      {matches.map((match) => {
+      <h5>{matchesStore.matchTime}</h5>
+      {matchesStore.matches.map((match) => {
         return <SingleMatch match={match} key={match.id} />;
       })}
-      <button onClick={handleStart}>Start</button>
-      <button onClick={handleReset}>Reset</button>
-      <button onClick={handleStop}>Stop</button>
+      <MatchesButton />
     </div>
   );
-};
+});

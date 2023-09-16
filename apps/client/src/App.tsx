@@ -1,5 +1,4 @@
-import "./App.css";
-import { Matches } from "./features/Matches";
+import { Matches } from "./pages";
 
 function App() {
   return (

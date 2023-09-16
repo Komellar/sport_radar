@@ -24,7 +24,8 @@
     "paths": {
       "@components/*": ["src/components/*"],
       "@features/*": ["src/features/*"],
-      "@common/*": ["src/common/*"]
+      "@common/*": ["src/common/*"],
+      "@store/*": ["src/store/*"]
     }
   },
   "include": ["src"],

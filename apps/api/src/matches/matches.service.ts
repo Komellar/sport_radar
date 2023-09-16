@@ -1,7 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import {
+  Observable,
+  Subject,
+  interval,
+  map,
+  merge,
+  takeUntil,
+  timer,
+} from 'rxjs';
+
 import { Match } from './entities/match.entity';
-import { Subject, interval, map, merge, takeUntil, timer } from 'rxjs';
 import { initData } from './constants/initData';
+import { MatchMessages, MatchSimulation } from './types';
 
 @Injectable()
 export class MatchesService {
@@ -13,20 +23,26 @@ export class MatchesService {
     return this.matches;
   }
 
-  start() {
-    timer(10000).subscribe(() => this.stop$.next());
+  start(): Observable<MatchSimulation> {
+    const endTime$ = timer(10000).pipe(
+      map(() => ({ type: MatchMessages.EndTime })),
+      takeUntil(this.stop$),
+    );
 
     const goal$ = interval(2000).pipe(
-      map((num) => ({ type: 'goal', time: (num + 1) * 3 })),
+      map((num) => ({
+        type: MatchMessages.Matches,
+        time: (num + 1) * 3,
+      })),
       takeUntil(this.stop$),
     );
 
     const time$ = interval(1000).pipe(
-      map((num) => ({ type: 'time', time: num + 1 })),
+      map((num) => ({ type: MatchMessages.Time, time: num + 1 })),
       takeUntil(this.stop$),
     );
 
-    return merge(goal$, time$);
+    return merge(goal$, time$, endTime$);
   }
 
   stop() {

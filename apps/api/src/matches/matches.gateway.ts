@@ -5,8 +5,10 @@ import {
   WebSocketServer,
   SubscribeMessage,
 } from '@nestjs/websockets';
-import { MatchesService } from './matches.service';
 import { Server, Socket } from 'socket.io';
+
+import { MatchesService } from './matches.service';
+import { MatchMessages } from './types';
 
 @WebSocketGateway({
   cors: {
@@ -37,11 +39,20 @@ export class MatchesGateway
     const observable = this.matchesService.start();
 
     return observable.subscribe((subscriber) => {
-      if (subscriber.type === 'goal') {
-        const updatedMatches = this.matchesService.scoreGoal();
-        this.server.emit('matches', updatedMatches);
-      } else {
-        this.server.emit('time', subscriber.time);
+      switch (subscriber.type) {
+        case MatchMessages.Matches:
+          const updatedMatches = this.matchesService.scoreGoal();
+          this.server.emit(MatchMessages.Matches, updatedMatches);
+          break;
+        case MatchMessages.Time:
+          this.server.emit(MatchMessages.Time, subscriber.time);
+          break;
+        case MatchMessages.EndTime:
+          this.matchesService.stop();
+          this.server.emit(MatchMessages.EndTime);
+          break;
+        default:
+          break;
       }
     });
   }

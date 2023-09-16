@@ -1,4 +1,4 @@
-import { Match } from "./types";
+import { Match } from "../../types/match";
 
 export const SingleMatch = ({ match }: { match: Match }) => {
   return (
