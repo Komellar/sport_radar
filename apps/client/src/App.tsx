@@ -1,11 +1,7 @@
 import { Matches } from "./pages";
 
 function App() {
-  return (
-    <div>
-      <Matches />
-    </div>
-  );
+  return <Matches />;
 }
 
 export default App;

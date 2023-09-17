@@ -2,14 +2,20 @@ import { observer } from "mobx-react";
 import { useEffect } from "react";
 
 import { matchesStore } from "@store/MatchesStore";
-import { SingleMatch } from "@features/Matches/components/SingleMatch";
-import { MatchesButton } from "@features/Matches/components/MatchesButton/MatchesButton";
 import { socket } from "@common/socket";
+import { Card } from "@components/Card";
+import { PageContainer } from "@components/PageContainer";
 import {
   MatchResponseMessages,
   Match,
   MatchStatus,
 } from "@features/Matches/types";
+import {
+  CardHeader,
+  GoalsCounter,
+  MatchesButton,
+  SingleMatch,
+} from "@features/Matches/components";
 
 export const Matches = observer(() => {
   useEffect(() => {
@@ -28,12 +34,15 @@ export const Matches = observer(() => {
   });
 
   return (
-    <div>
-      <h5>{matchesStore.matchTime}</h5>
-      {matchesStore.matches.map((match) => {
-        return <SingleMatch match={match} key={match.id} />;
-      })}
-      <MatchesButton />
-    </div>
+    <PageContainer>
+      <Card>
+        <CardHeader>Qatar 2023</CardHeader>
+        <MatchesButton />
+        {matchesStore.matches.map((match) => (
+          <SingleMatch match={match} key={match.id} />
+        ))}
+        <GoalsCounter>Total goals: {matchesStore.totalGoals}</GoalsCounter>
+      </Card>
+    </PageContainer>
   );
 });

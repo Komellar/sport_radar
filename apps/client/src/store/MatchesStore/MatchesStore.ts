@@ -1,26 +1,38 @@
 import { makeAutoObservable } from "mobx";
 
 import { Match, MatchStatus } from "@features/Matches/types";
+import { StoreData } from "./types";
 
 class MatchesStore {
-  matches: Match[] = [];
-  matchTime: number = 0;
-  matchStatus: MatchStatus = MatchStatus.NotStarted;
+  private data: StoreData = {
+    matches: [],
+    matchStatus: MatchStatus.NotStarted,
+  };
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  setMatches(matches: Match[]): void {
-    this.matches = matches;
+  get matches() {
+    return this.data.matches;
   }
 
-  setTime(time: number): void {
-    this.matchTime = time;
+  get matchStatus() {
+    return this.data.matchStatus;
+  }
+
+  get totalGoals() {
+    return this.data.matches.reduce((sum, { score }) => {
+      return sum + score.away + score.home;
+    }, 0);
+  }
+
+  setMatches(matches: Match[]): void {
+    this.data.matches = matches;
   }
 
   setMatchStatus(status: MatchStatus) {
-    this.matchStatus = status;
+    this.data.matchStatus = status;
   }
 }
 
