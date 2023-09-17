@@ -36,7 +36,7 @@ export class MatchesService {
     );
 
     const goal$ = interval(GOAL_INTERVAL).pipe(
-      takeWhile((num) => num * 1000 < MATCH_TIME),
+      takeWhile((num) => num * 10000 < MATCH_TIME),
       takeUntil(this.stop$),
       map(() => ({ type: MatchMessages.Matches })),
     );
