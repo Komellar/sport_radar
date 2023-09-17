@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 import { Match, MatchStatus } from "@features/Matches/types";
 import { StoreData } from "./types";
 
-class MatchesStore {
+export class MatchesStore {
   private data: StoreData = {
     matches: [],
     matchStatus: MatchStatus.NotStarted,
