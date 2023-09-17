@@ -4,13 +4,6 @@ import { MatchesService } from './matches.service';
 import { Server, Socket } from 'socket.io';
 import { Observable, of } from 'rxjs';
 import { MatchMessages, MatchSimulation } from './types';
-import { Match } from './entities/match.entity';
-
-const mockMatch: Match = {
-  id: 'id-1',
-  score: { home: 0, away: 1 },
-  teams: { home: 'a', away: 'b' },
-};
 
 describe('MatchesGateway', () => {
   let gateway: MatchesGateway;
@@ -30,6 +23,7 @@ describe('MatchesGateway', () => {
       to: jest.fn(() => server),
       emit: jest.fn(),
     } as any;
+
     gateway.server = server;
 
     socket = {
@@ -77,7 +71,13 @@ describe('MatchesGateway', () => {
 
       const scoreGoalMock = jest
         .spyOn(matchesService, 'scoreGoal')
-        .mockReturnValue([mockMatch]);
+        .mockReturnValue([
+          {
+            id: 'id-1',
+            score: { home: 0, away: 1 },
+            teams: { home: 'a', away: 'b' },
+          },
+        ]);
 
       gateway.startSimulation(socket);
 

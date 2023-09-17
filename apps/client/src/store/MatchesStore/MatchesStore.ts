@@ -13,15 +13,15 @@ export class MatchesStore {
     makeAutoObservable(this);
   }
 
-  get matches() {
+  get matches(): Match[] {
     return this.data.matches;
   }
 
-  get matchStatus() {
+  get matchStatus(): MatchStatus {
     return this.data.matchStatus;
   }
 
-  get totalGoals() {
+  get totalGoals(): number {
     return this.data.matches.reduce((sum, { score }) => {
       return sum + score.away + score.home;
     }, 0);
@@ -31,7 +31,7 @@ export class MatchesStore {
     this.data.matches = matches;
   }
 
-  setMatchStatus(status: MatchStatus) {
+  setMatchStatus(status: MatchStatus): void {
     this.data.matchStatus = status;
   }
 }
