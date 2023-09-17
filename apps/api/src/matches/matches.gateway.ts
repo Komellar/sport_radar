@@ -26,7 +26,7 @@ export class MatchesGateway
   handleConnection(client: Socket) {
     console.log(`Connected client: ${client.id}`);
 
-    const matches = this.matchesService.initMatches();
+    const matches = this.matchesService.initMatches(client.id);
     this.server.emit('matches', matches);
   }
 
@@ -35,21 +35,17 @@ export class MatchesGateway
   }
 
   @SubscribeMessage('start')
-  startSimulation() {
+  startSimulation({ id: clientId }: Socket) {
     const observable = this.matchesService.start();
 
     return observable.subscribe((subscriber) => {
       switch (subscriber.type) {
         case MatchMessages.Matches:
-          const updatedMatches = this.matchesService.scoreGoal();
-          this.server.emit(MatchMessages.Matches, updatedMatches);
-          break;
-        case MatchMessages.Time:
-          this.server.emit(MatchMessages.Time, subscriber.time);
+          const updatedMatches = this.matchesService.scoreGoal(clientId);
+          this.server.to(clientId).emit(MatchMessages.Matches, updatedMatches);
           break;
         case MatchMessages.EndTime:
-          this.matchesService.stop();
-          this.server.emit(MatchMessages.EndTime);
+          this.server.to(clientId).emit(MatchMessages.EndTime);
           break;
         default:
           break;
@@ -58,9 +54,9 @@ export class MatchesGateway
   }
 
   @SubscribeMessage('restart')
-  restartSimulation() {
-    const matches = this.matchesService.initMatches();
-    this.server.emit('matches', matches);
+  restartSimulation({ id: clientId }: Socket) {
+    const matches = this.matchesService.initMatches(clientId);
+    this.server.to(clientId).emit('matches', matches);
   }
 
   @SubscribeMessage('stop')

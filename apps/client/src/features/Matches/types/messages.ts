@@ -1,6 +1,5 @@
 export enum MatchResponseMessages {
   Matches = "matches",
-  Time = "time",
   EndTime = "endTime",
 }
 

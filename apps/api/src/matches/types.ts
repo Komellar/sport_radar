@@ -10,10 +10,9 @@ export interface Score {
 
 export enum MatchMessages {
   Matches = 'matches',
-  Time = 'time',
   EndTime = 'endTime',
 }
+
 export interface MatchSimulation {
   type: MatchMessages;
-  time?: number;
 }

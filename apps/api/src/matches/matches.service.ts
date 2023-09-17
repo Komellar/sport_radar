@@ -4,57 +4,54 @@ import {
   Subject,
   interval,
   map,
-  merge,
+  mergeWith,
   takeUntil,
+  takeWhile,
   timer,
 } from 'rxjs';
 
 import { Match } from './entities/match.entity';
 import { initData } from './constants/initData';
 import { MatchMessages, MatchSimulation } from './types';
+import { GOAL_INTERVAL, MATCH_TIME } from './constants/time';
 
 @Injectable()
 export class MatchesService {
-  private matches: Match[] = [];
+  private matches: Record<string, Match[]> = {};
   private stop$ = new Subject<void>();
 
-  initMatches() {
-    this.matches = JSON.parse(JSON.stringify(initData));
-    return this.matches;
+  initMatches(clientId: string): Match[] {
+    this.matches[clientId] = JSON.parse(JSON.stringify(initData));
+    return this.matches[clientId];
   }
 
   start(): Observable<MatchSimulation> {
-    const endTime$ = timer(10000).pipe(
+    const endTime$ = timer(MATCH_TIME).pipe(
+      takeUntil(this.stop$),
       map(() => ({ type: MatchMessages.EndTime })),
-      takeUntil(this.stop$),
     );
 
-    const goal$ = interval(2000).pipe(
-      map((num) => ({
-        type: MatchMessages.Matches,
-        time: (num + 1) * 3,
-      })),
+    const goal$ = interval(GOAL_INTERVAL).pipe(
+      takeWhile((num) => num * 1000 < MATCH_TIME),
       takeUntil(this.stop$),
+      map(() => ({ type: MatchMessages.Matches })),
     );
 
-    const time$ = interval(1000).pipe(
-      map((num) => ({ type: MatchMessages.Time, time: num + 1 })),
-      takeUntil(this.stop$),
-    );
-
-    return merge(goal$, time$, endTime$);
+    return goal$.pipe(mergeWith(endTime$));
   }
 
-  stop() {
+  stop(): void {
     this.stop$.next();
   }
 
-  scoreGoal() {
-    const matchIndex = Math.floor(Math.random() * this.matches.length);
+  scoreGoal(clientId: string): Match[] {
+    const matchIndex = Math.floor(
+      Math.random() * this.matches[clientId].length,
+    );
     const randomTeam = Math.random() > 0.5 ? 'home' : 'away';
 
-    this.matches[matchIndex].score[randomTeam]++;
+    this.matches[clientId][matchIndex].score[randomTeam]++;
 
-    return this.matches;
+    return this.matches[clientId];
   }
 }

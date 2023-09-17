@@ -6,7 +6,7 @@ export const getButtonText = (matchStatus: MatchStatus) => {
       return "Start";
 
     case MatchStatus.Running:
-      return "Stop";
+      return "Finish";
 
     case MatchStatus.Finished:
       return "Reset";
