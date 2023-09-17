@@ -20,9 +20,13 @@ export class MatchesService {
   private matches: Record<string, Match[]> = {};
   private stop$ = new Subject<void>();
 
+  getMatches(clientId: string) {
+    return this.matches[clientId] || [];
+  }
+
   initMatches(clientId: string): Match[] {
     this.matches[clientId] = JSON.parse(JSON.stringify(initData));
-    return this.matches[clientId];
+    return this.getMatches(clientId);
   }
 
   start(): Observable<MatchSimulation> {
@@ -52,6 +56,6 @@ export class MatchesService {
 
     this.matches[clientId][matchIndex].score[randomTeam]++;
 
-    return this.matches[clientId];
+    return this.getMatches(clientId);
   }
 }
